@@ -12,7 +12,7 @@ Output should be a small data-journalistic piece with the following questions:
 * Should we throw away the Christmas holidays? (24.12.2016 00:00:00 -> 02.01.2017 00:00:00)
 
 ## Results
-### Mean of Fullness all Weekdays, all Hours per Biliothek
+### Mean of Fullness all Weekdays, all Hours per Bibliothek
 ```R
                                       Bibliothek `mean(Belegt)`
                                           <fctr>          <dbl>
