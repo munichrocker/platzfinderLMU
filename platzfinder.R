@@ -1,6 +1,7 @@
 library(dplyr)
 library(ggplot2)
 library(lubridate)
+library(extrafont)
 
 colN <- c("Bibliothek", "Belegt", "Leer", "Datum")
 d <- read.csv2("data.csv", stringsAsFactors = TRUE, col.names = colN, colClasses = c("factor", "numeric", "numeric", "POSIXct"), header = FALSE, encoding = "UTF-8", na.strings = "Geschlossen")
@@ -18,32 +19,40 @@ w %>%
   group_by(hour) %>% 
   summarise(mean(Belegt)) -> week
 
+## Plotting Weekday vs Weekend
+ggplot() +
+  geom_line(data = week, aes(hour, `mean(Belegt)`), color = "red", size = 1.5) +
+  geom_line(data = weekend, aes(hour, `mean(Belegt)`), color = "blue", size = 1.5) +
+  labs(title = "Belegung im Tagesverlauf", subtitle = "Rot: Werktag, Blau: Wochenende") +
+  ylab("Belegung in Prozent") + 
+  xlab("Stunden")
+
+##
+# Create PNG for each Hour of the Day
+###
 #Make copy of w-df
 w_nas <- w
 #replace NAs with 0
 w_nas[is.na(w_nas$Belegt),]$Belegt <- 0
 
+#Here is the Problem somewhere: DOes execute correctly, does calculate corretly, 
+#but gives only empty images 
 for (i in 8:23){
   w_help = NULL
-  
+
   w_nas %>% 
     filter(hour==i) %>% 
     group_by(Bibliothek) %>% 
-    summarise(mean(Belegt)) -> w_help
+    summarise(mean = mean(Belegt)) -> w_help
+  print(head(w_help))
   
-  ggplot(w_nas, aes(mean(Belegt)))
+  png(paste0(i,".png"), width = 500, units = "px")
+  ggplot(w_help, aes(Bibliothek, mean)) +
+    geom_bar(stat="identity", fill = "#008659") +
+    coord_flip() +
+    theme(text = element_text(family = "Arial"), axis.title = element_blank(), plot.title = element_text(hjust = 2.7, face = "bold", size = 18, margin = margin(b = 5))) +
+    labs(title = paste("Besetze Plätze in den UB-Bibs um", i, "Uhr")) +
+    scale_y_continuous(limits = c(0, 100))
+  dev.off()
+  graphics.off()
 }
-
-w_nas %>% 
-  filter(hour==11) %>% 
-  group_by(Bibliothek) %>% 
-  summarise(mean = mean(Belegt)) -> w_help
-
-png("test.png", width = 500, units = "px", pointsize = 14)
-ggplot(w_help, aes(Bibliothek, mean)) +
-  geom_bar(stat="identity", fill = "#008659") +
-  coord_flip() +
-  theme(axis.title = element_blank(), plot.title = element_text(hjust = 2.7, face = "bold", size = 18)) +
-  labs(title = paste("Besetze Plätze in den UB-Bibs um", "11", "Uhr")) +
-  scale_y_continuous(limits = c(0, 100))
-dev.off()
