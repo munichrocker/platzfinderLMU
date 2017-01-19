@@ -21,8 +21,8 @@ w %>%
 
 ## Plotting Weekday vs Weekend
 ggplot() +
-  geom_line(data = week, aes(hour, `mean(Belegt)`), color = "red", size = 1.5) +
-  geom_line(data = weekend, aes(hour, `mean(Belegt)`), color = "blue", size = 1.5) +
+  geom_line(data = week, aes(hour, `mean(Belegt)`), color = "red", size = 1.2) +
+  geom_line(data = weekend, aes(hour, `mean(Belegt)`), color = "blue", size = 1.2) +
   labs(title = "Belegung im Tagesverlauf", subtitle = "Rot: Werktag, Blau: Wochenende") +
   ylab("Belegung in Prozent") + 
   xlab("Stunden")
@@ -49,10 +49,9 @@ for (i in 8:23){
   p <- ggplot(w_help, aes(Bibliothek, mean)) +
     geom_bar(stat="identity", fill = "#008659") +
     coord_flip() +
-    theme(text = element_text(family = "Arial"), axis.title = element_blank(), plot.title = element_text(hjust = 2.7, face = "bold", size = 18, margin = margin(b = 5))) +
-    labs(title = paste("Besetze Plätze in den UB-Bibs um", i, "Uhr")) +
+    theme(text = element_text(family = "Arial"), axis.title = element_blank(), plot.title = element_text(face = "bold", size = 18)) +
+    labs(title = paste("Besetzte UB-Plätze um", i, "Uhr")) +
     scale_y_continuous(limits = c(0, 100))
   print(p)
   dev.off()
-  graphics.off()
 }
