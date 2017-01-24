@@ -11,9 +11,19 @@ d %>%
   filter(Datum > "2016-12-17 23:45:29") %>% 
   mutate(weekday = weekdays.POSIXt(Datum), hour = hour(Datum)) -> w
 
+# Test how christmas time changes
+w %>% 
+  select(Bibliothek, Belegt, weekday, hour, Datum) %>% 
+  filter(Datum <= "2016-12-23 23:59:59" | Datum >= "2017-01-02 00:00:00") %>% 
+  filter(complete.cases(.)) %>% 
+  filter(weekday != "Samstag" & weekday != "Sonntag") %>% 
+  group_by(hour) %>% 
+  summarise(mean(Belegt))
+
 # create tbl_df for weekend and weekday with mean per hour
 w %>% 
-  select(Bibliothek, Belegt, weekday, hour) %>% 
+  select(Bibliothek, Belegt, weekday, hour, Datum) %>%
+  filter(Datum <= "2016-12-23 23:59:59" | Datum >= "2017-01-02 00:00:00") %>% 
   filter(complete.cases(.)) %>% 
   filter(weekday != "Samstag" & weekday != "Sonntag") %>% 
   group_by(hour) %>% 
