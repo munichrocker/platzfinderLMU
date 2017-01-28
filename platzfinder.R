@@ -7,21 +7,13 @@ library(grid)
 colN <- c("Bibliothek", "Belegt", "Leer", "Datum")
 d <- read.csv2("data.csv", stringsAsFactors = TRUE, col.names = colN, colClasses = c("factor", "numeric", "numeric", "POSIXct"), header = FALSE, encoding = "UTF-8", na.strings = "Geschlossen")
 
-#Remove Test-Data and create new columns
+#Remove Test-Data and create new columns, filter out Christmas-Time
 d %>% 
   filter(Datum > "2016-12-17 23:45:29") %>% 
   filter(Datum <= "2016-12-23 23:59:59" | Datum >= "2017-01-02 00:00:00") %>% 
   mutate(weekday = weekdays.POSIXt(Datum), hour = hour(Datum)) -> w
 
 w$weekday <- factor(w$weekday, levels = c("Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"))
-# Test how christmas time changes
-w %>% 
-  select(Bibliothek, Belegt, weekday, hour, Datum) %>% 
-  filter(Datum <= "2016-12-23 23:59:59" | Datum >= "2017-01-02 00:00:00") %>% 
-  filter(complete.cases(.)) %>% 
-  filter(weekday != "Samstag" & weekday != "Sonntag") %>% 
-  group_by(hour) %>% 
-  summarise(mean(Belegt))
 
 # create tbl_df for weekend and weekday with mean per hour
 w %>% 
@@ -34,13 +26,15 @@ w %>%
 
 ## Plotting Weekday vs Weekend
 ggplot() +
-  geom_line(data = week, aes(hour, `mean(Belegt)`), color = "red", size = 1.2) +
-  geom_line(data = weekend, aes(hour, `mean(Belegt)`), color = "blue", size = 1.2) +
-  labs(title = "Belegung im Tagesverlauf", subtitle = "Rot: Werktag, Blau: Wochenende") +
+  geom_line(data = weekend, aes(hour, `mean(Belegt)`), color = "#590086", size = 1.3) +
+  geom_area(data = weekend, aes(hour, `mean(Belegt)`), color = "#dd9aff", alpha = 0.2) +
+  geom_line(data = week, aes(hour, `mean(Belegt)`), color = "#865900", size = 1.3) +
+  geom_area(data = week, aes(hour, `mean(Belegt)`), fill = "#ffd686", alpha = 0.6) +
+  labs(title = "Belegung im Tagesverlauf", subtitle = "Braun: Werktag, Blau: Wochenende") +
   ylab("Belegung in Prozent") + 
   xlab("Stunden") +
   theme_bw() +
-  theme(text = element_text(size = 16),
+  theme(text = element_text(size = 12),
         plot.margin = unit(c(1, 1, 4, 1), "lines"),
         panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank(),
@@ -65,12 +59,12 @@ ggplot(weekday_by_hour, aes(hour, mean)) +
 svg("weekday_per_hour.svg", pointsize = 28, width = 11.78, height = 8.39)
 g1 <- ggplot(weekday_by_hour, aes(x = interaction(weekday, hour, lex.order = TRUE), y = mean, group = 1)) +
   geom_line(colour = "#008659", size = 1.3) +
-  geom_area(fill = "#00d38c") +
+  geom_area(fill = "#86ffd6", alpha = 0.5) +
   coord_cartesian(ylim = c(0, 65), expand = FALSE) +
   annotate(geom = "text", x = seq_len(nrow(weekday_by_hour)), y = -1, label = weekday_by_hour$hour, size = 2) +
   annotate(geom = "text", x = 9 + 16 * (0:6), y = -4, label = unique(weekday_by_hour$weekday), size = 5) +
   theme_bw() +
-  theme(text = element_text(size = 16),
+  theme(text = element_text(size = 12),
         plot.margin = unit(c(1, 1, 4, 1), "lines"),
         axis.title.x = element_blank(),
         axis.text.x = element_blank(),
