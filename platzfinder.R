@@ -38,7 +38,13 @@ ggplot() +
   geom_line(data = weekend, aes(hour, `mean(Belegt)`), color = "blue", size = 1.2) +
   labs(title = "Belegung im Tagesverlauf", subtitle = "Rot: Werktag, Blau: Wochenende") +
   ylab("Belegung in Prozent") + 
-  xlab("Stunden")
+  xlab("Stunden") +
+  theme_bw() +
+  theme(text = element_text(size = 16),
+        plot.margin = unit(c(1, 1, 4, 1), "lines"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.border = element_blank())
 
 ## Plotting Every day by hour
 w %>% 
@@ -56,6 +62,7 @@ ggplot(weekday_by_hour, aes(hour, mean)) +
   xlab("Zeit")
 
 # gelöst in einem Plot
+svg("weekday_per_hour.svg", pointsize = 28, width = 11.78, height = 8.39)
 g1 <- ggplot(weekday_by_hour, aes(x = interaction(weekday, hour, lex.order = TRUE), y = mean, group = 1)) +
   geom_line(colour = "#008659", size = 1.3) +
   geom_area(fill = "#00d38c") +
@@ -63,18 +70,21 @@ g1 <- ggplot(weekday_by_hour, aes(x = interaction(weekday, hour, lex.order = TRU
   annotate(geom = "text", x = seq_len(nrow(weekday_by_hour)), y = -1, label = weekday_by_hour$hour, size = 2) +
   annotate(geom = "text", x = 9 + 16 * (0:6), y = -4, label = unique(weekday_by_hour$weekday), size = 5) +
   theme_bw() +
-  theme(plot.margin = unit(c(1, 1, 4, 1), "lines"),
+  theme(text = element_text(size = 16),
+        plot.margin = unit(c(1, 1, 4, 1), "lines"),
         axis.title.x = element_blank(),
         axis.text.x = element_blank(),
         panel.grid.major.x = element_blank(),
-        panel.grid.minor.x = element_blank()) +
+        panel.grid.minor.x = element_blank(),
+        panel.border = element_blank()) +
   geom_hline(yintercept = mean(weekday_by_hour$mean), linetype = 3) +
-  ylab("Durchschnittsbelegung in Prozent")
+  ylab("Durchschnittsbelegung in Prozent") +
+  ggtitle("Bib-Belegung im Wochenmittel")
 
 g2 <- ggplot_gtable(ggplot_build(g1))
 g2$layout$clip[g2$layout$name == "panel"] <- "off"
 grid::grid.draw(g2)
-
+dev.off()
 ##
 # Create PNG for each Hour of the Day
 ###
