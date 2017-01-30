@@ -31,6 +31,7 @@ Output should be a small data-journalistic piece with the following questions:
 12                  FB Theologie und Philosophie      56.733292
 13    FB Wirtschaftswissenschaften und Statistik       7.415789
 ```
+```R
 ###Mean of Fullness over all Bibliotheken per Hour of the day
     hour `mean(Belegt)`
    <int>          <dbl>
@@ -50,4 +51,4 @@ Output should be a small data-journalistic piece with the following questions:
 14    21      17.362301
 15    22      18.268966
 16    23      17.181435
-
+```
