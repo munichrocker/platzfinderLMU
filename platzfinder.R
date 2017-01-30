@@ -25,20 +25,22 @@ w %>%
   summarise(mean(Belegt)) -> week
 
 ## Plotting Weekday vs Weekend
+svg("week_vs_weekend.svg", pointsize = 28, width = 11.78, height = 8.39)
 ggplot() +
   geom_line(data = weekend, aes(hour, `mean(Belegt)`), color = "#590086", size = 1.3) +
   geom_area(data = weekend, aes(hour, `mean(Belegt)`), color = "#dd9aff", alpha = 0.2) +
   geom_line(data = week, aes(hour, `mean(Belegt)`), color = "#865900", size = 1.3) +
   geom_area(data = week, aes(hour, `mean(Belegt)`), fill = "#ffd686", alpha = 0.6) +
-  labs(title = "Belegung im Tagesverlauf", subtitle = "Braun: Werktag, Blau: Wochenende") +
+  labs(title = "Durchschnitts-Belegung im Tagesverlauf", subtitle = "Braun: Werktag, Blau: Wochenende") +
   ylab("Belegung in Prozent") + 
-  xlab("Stunden") +
+  xlab("Uhrzeit") +
   theme_bw() +
   theme(text = element_text(size = 12),
         plot.margin = unit(c(1, 1, 4, 1), "lines"),
         panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank(),
         panel.border = element_blank())
+dev.off()
 
 ## Plotting Every day by hour
 w %>% 
@@ -57,6 +59,7 @@ ggplot(weekday_by_hour, aes(hour, mean)) +
 
 # gelöst in einem Plot
 svg("weekday_per_hour.svg", pointsize = 28, width = 11.78, height = 8.39)
+#png("weekday_per_hour.png", pointsize = 28, width = 500)
 g1 <- ggplot(weekday_by_hour, aes(x = interaction(weekday, hour, lex.order = TRUE), y = mean, group = 1)) +
   geom_line(colour = "#008659", size = 1.3) +
   geom_area(fill = "#86ffd6", alpha = 0.5) +
@@ -72,8 +75,7 @@ g1 <- ggplot(weekday_by_hour, aes(x = interaction(weekday, hour, lex.order = TRU
         panel.grid.minor.x = element_blank(),
         panel.border = element_blank()) +
   geom_hline(yintercept = mean(weekday_by_hour$mean), linetype = 3) +
-  ylab("Durchschnittsbelegung in Prozent") +
-  ggtitle("Bib-Belegung im Wochenmittel")
+  ylab("Durchschnittsbelegung in Prozent")
 
 g2 <- ggplot_gtable(ggplot_build(g1))
 g2$layout$clip[g2$layout$name == "panel"] <- "off"
